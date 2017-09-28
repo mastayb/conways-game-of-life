@@ -68,6 +68,17 @@ class Grid:
             out += "\n"
         return out
 
+    def resize(self, new_r, new_c):
+        newGrid = [[0 for _ in range(new_c)] for _ in range(new_r)]
+
+        for i in range(min(self.__num_rows, new_r)):
+            for j in range(min(self.__num_columns, new_c)):
+                newGrid[i][j] = self.grid[i][j]
+        self.grid = newGrid
+        self.__num_rows = new_r
+        self.__num_columns = new_c
+
+
 
         
     def set_alive(self, row, column):
@@ -103,27 +114,44 @@ def print_legend(window):
     y,x = window.getmaxyx()
     window.addstr(y//2,x//2-len(legend)//2, legend)
 
-def init_game(stdscr):
+def init_windows(stdscr):
     curses.curs_set(0)
     stdscr.clear()
     screen_y,screen_x = stdscr.getmaxyx()
     legend_y = 1
     game_win_y, game_win_x = screen_y-legend_y, screen_x
-    game_y = game_win_y
-    game_x = game_win_x-1
 
-    g = init_random_grid(game_y, game_x)
     game_win = curses.newwin(game_win_y, game_win_x, 0,0)
     legend_win = curses.newwin(legend_y, game_win_x, game_win_y,0)
     print_legend(legend_win)
-    return game_win, g, legend_win
+    return game_win, legend_win
+
+def init_game(game_win):
+    y,x = game_win.getmaxyx()
+    g = init_random_grid(y, x-1)
+    return g
+
+def resize_game(game_win, grid):
+    y,x = game_win.getmaxyx()
+    grid.resize(y,x-1)
+    return grid
 
 def game_main(stdscr):
-    run_game = True
 
-    while run_game:
-        game_win, grid, legend_win = init_game(stdscr)
-        run_game = game_loop(stdscr, game_win, grid, legend_win)
+    game_win, legend_win = init_windows(stdscr)
+    grid = init_game(game_win)
+    while True:
+        cmd = game_loop(stdscr, game_win, grid, legend_win)
+
+        if cmd == "RESTART":
+            game_win, legend_win = init_windows(stdscr)
+            grid = init_game(game_win)
+        elif cmd == "RESIZE":
+            game_win, legend_win = init_windows(stdscr)
+            grid = resize_game(game_win, grid)
+        else:
+            break
+            
 
 
 def game_loop(stdscr, game_win, grid, legend_win):
@@ -133,13 +161,13 @@ def game_loop(stdscr, game_win, grid, legend_win):
     while True:
         c = stdscr.getch()
         if c == ord('q'):
-            return False
+            return None 
         elif c == ord('p'):
-            paused = True
+            paused = not paused
         elif c == ord('r'):
-            return True 
+            return "RESTART" 
         elif c == curses.KEY_RESIZE:
-            return True 
+            return "RESIZE"
         elif not paused:
             g.update()
             g.draw(game_win)
