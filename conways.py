@@ -79,7 +79,7 @@ def game_loop(stdscr, game_win, grid, legend_win):
     g = grid
     stdscr.nodelay(True)
     paused = False
-    for _ in range(100):
+    while True:
         c = stdscr.getch()
         if c == ord('q'):
             return None 
@@ -96,10 +96,8 @@ def game_loop(stdscr, game_win, grid, legend_win):
 #            time.sleep(.05)
             curses.doupdate()
 
-import cProfile
 if __name__ == "__main__":
-    #curses.wrapper(game_main)
+    curses.wrapper(game_main)
 
-    cProfile.run('curses.wrapper(game_main)')
 
 
