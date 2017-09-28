@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: UTF-8 -*-
 
 #######################################
 #
@@ -59,9 +60,15 @@ class Grid:
         out = ""
         for row in self.grid:
             for cell in row:
-                out += str(cell) + " "
+                if cell:
+                    out += '█'
+                else:
+                    out += '░'
+                #out += str(cell) + " "
             out += "\n"
         return out
+
+
         
     def set_alive(self, row, column):
         self.grid[row][column] = 1
