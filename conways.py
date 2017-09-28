@@ -9,6 +9,7 @@
 #######################################
 
 import time
+import curses
 
 def wrap(x, max_x):
     if x < 0:
@@ -73,18 +74,44 @@ class Grid:
     def set_alive(self, row, column):
         self.grid[row][column] = 1
 
+    def draw(self, window):
+        window.clear()
+        curses.curs_set(0)
+
+        for y,row in enumerate(self.grid):
+            for x,cell in enumerate(row):
+                if cell:
+                    window.addstr(y,x,' ', curses.A_STANDOUT)
+                else:
+                    window.addstr(y,x,' ')
+        window.refresh()
+
+
+
+
+def init_grid(r,c):
+    g = Grid(r,c)
+    g.set_alive(0,1)
+    g.set_alive(1,2)
+    g.set_alive(2,0)
+    g.set_alive(2,1)
+    g.set_alive(2,2)
+    return g
+
+def game_main(stdscr):
+    rows, columns = stdscr.getmaxyx()
+    g = init_grid(rows-1, columns-1)
+    game_loop(stdscr, g)
+
+
+def game_loop(stdscr, grid):
+    while True:
+        grid.update()
+        grid.draw(stdscr)
 
                 
 if __name__ == "__main__":
-    g = Grid(5,5)
+    curses.wrapper(game_main)
 
-    g.set_alive(4,2)
-    g.set_alive(0,2)
-    g.set_alive(1,2)
-
-    while(True):
-        g.update()
-        print(g)
-        time.sleep(1)
 
 
