@@ -10,6 +10,7 @@
 
 import time
 import curses
+import random
 
 def wrap(x, max_x):
     if x < 0:
@@ -88,8 +89,17 @@ class Grid:
 
 
 
+def init_random_grid(r,c):
+    g = Grid(r,c)
+    for _ in range(random.randint(0, r*c)):
+        g.set_alive(random.randint(0,r-1), random.randint(0,c-1))
+    return g
 
-def init_grid(r,c):
+
+
+
+
+def init_glider(r,c):
     g = Grid(r,c)
     g.set_alive(0,1)
     g.set_alive(1,2)
@@ -100,7 +110,7 @@ def init_grid(r,c):
 
 def game_main(stdscr):
     rows, columns = stdscr.getmaxyx()
-    g = init_grid(rows-1, columns-1)
+    g = init_random_grid(rows-1, columns-1)
     game_loop(stdscr, g)
 
 
@@ -108,6 +118,7 @@ def game_loop(stdscr, grid):
     while True:
         grid.update()
         grid.draw(stdscr)
+#        time.sleep(0.1)
 
                 
 if __name__ == "__main__":
