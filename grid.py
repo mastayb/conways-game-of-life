@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
-import random
-
+import curses
 class Grid:
     def __init__(self, rows, columns):
         self.grid = [[0 for _ in range(columns)] for _ in range(rows)]
@@ -60,17 +59,14 @@ class Grid:
     def set_alive(self, row, column):
         self.grid[row][column] = 1
 
+    def draw(self, window):
+        window.erase()
+        for y,row in enumerate(self.grid):
+            for x,cell in enumerate(row):
+                if cell:
+                    window.addstr(y,x,' ', curses.A_STANDOUT)
+                else:
+                    window.addstr(y,x,' ')
+        window.noutrefresh()
 
 
-def init_random_grid(r,c):
-    g = Grid(r,c)
-    for _ in range(random.randint(0, r*c)):
-        g.set_alive(random.randint(0,r-1), random.randint(0,c-1))
-    return g
-
-
-def grid_loop(grid, output_q):
-    grid.update()
-    output_q.put(copy.deepcopy(grid.grid))
-
-    
